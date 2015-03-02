@@ -33,5 +33,5 @@
 
   這個正體中文的專案翻譯自 [Paul Nettle](https://github.com/nettlep) 的 [learn-swift](https://github.com/nettlep/learn-swift)。
 
-###翻譯進度
-2.Basic operations.playground/
+###翻譯目錄
+[學習 Swift - 目錄](http://tsunghao.github.io/post/2015/02/learn-swift-table-of-content/)
