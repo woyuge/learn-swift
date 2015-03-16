@@ -1,20 +1,18 @@
 // ------------------------------------------------------------------------------------------------
-// Things to know:
+// 本篇須知：
 //
-// * Automatic Reference Counting allows Swift to track and manage your app's memory usage. It
-//   automatically frees up memory from unused instances that are no longer in use.
+// * 自動參考計數(Automatic Reference Counting)允許 Swift 追蹤並管理你 app 的記憶體使用狀況。它自動地將
+//   已不需要的實體記憶體釋放出來
 //
-// * Reference counting only applies to classes as structures and enumerations are value types.
+// * 參考計數只會用在參考型別的類別上，因為結構與列舉都是值型別
 //
-// * Whenever a class instance is stored (to a property, constant or variable) a
-//   "strong reference" is made. A strong reference ensures that the reference is not deallocated
-//   for as long as the strong reference remains.
+// * 每當一個類別實體被賦值(給一個屬性、常數或變數)的時候，就會製造一個 "強參考" 計數，強參考可以確保只要當它還
+//   需要使用，就不會被釋放
 // ------------------------------------------------------------------------------------------------
 
-// We can't really see ARC in actino within a Playground, but we can still follow along what
-// would normally happen.
+// 我們不能真的看到自動參考計數在遊樂場中是怎麼運作的，但我們依然能繼續往下看看會發生什麼事
 //
-// We'll start by creating a class to work with
+// 我們將從創造這個類別開始著手
 class Person
 {
 	let name: String
@@ -24,34 +22,29 @@ class Person
 	}
 }
 
-// We'll want to create a person and then remove our reference to it, which means we'll need to
-// use an optional Person type stored in a variable:
+// 我們想要先創建一個 person 實體，然後再釋放它的參考，這表示我們需要將這個變數宣告為可選 Person 型別：
 var person: Person? = Person(name: "Bill")
 
-// We now have a single strong reference to a single Person object.
+// 現在我們擁有一個指向單一 Persen 實體的強參考
 //
-// If we assign 'person' to another variable or constant, we'll increse the reference conunt by 1
-// for a total of 2:
+// 如果我們將 'person' 賦值給其他變數或常數，將會增加 1 個參考計數，現在 Person 實體的參考計數總數是 2：
 var copyOfPerson = person
 
-// With a reference count of 2, we can set our original reference to nil. This will drop our
-// reference count down to 1.
+// 在參考計數總數為 2 的狀況下，我們可以將原本的參考設為 nil。這個動作將讓參考計數的數目降到 1
 person = nil
 
-// The copyOfPerson still exists and holds a strong reference to our instance:
+// copyOfPerson 變數依然存在，而且儲存了一個代表 Person 實體的強參考：
 copyOfPerson
 
-// If we clear out this reference, we will drop the reference count once more to 0, causing the
-// object to be cleaned up by ARC:
+// 如果我們移除這個參考，那麼參考計數的數目將被降低到剩下 0 個，使得這個物件從參考計數中被移除：
 copyOfPerson = nil
 
 // ------------------------------------------------------------------------------------------------
-// Strong Reference Cycles between class instances
+// 在類別實體間的強參考循環
 //
-// If two classes hold a reference to each other, then they create a "Strong Reference Cycle".
+// 如果兩個類別之間互相參考，那麼它們將創建一個 "強參考循環"
 //
-// Here's an example of two classes that are capable of holding references to one another, but
-// do not do so initially (their references are optional and defaulted to nil):
+// 這兒的例子，是兩個互相持有對方參考的類別，但參考沒有做初始化(它們對彼此的參考是可選型別，所以默認為 nil)：
 class Tenant
 {
 	let name: String
@@ -67,60 +60,54 @@ class Apartment
 	init (number: Int) { self.number = number }
 }
 
-// We can create a tenant and an apartment which are not associated to each other. After these
-// two lines of code, each instance will have a reference count of 1.
+// 我們可以創建一個內部屬性還沒有互相參考的 tenant 以及一個 apartment，在下面兩行程式碼中，每個實體都會有數目
+// 為 1 的參考計數：
 var bill: Tenant? = Tenant(name: "Bill")
 var number73: Apartment? = Apartment(number: 73)
 
-// Let's link them up.
+// 讓我們將它們聯結起來
 //
-// This will create a strong reference cycle because each instance will have a reference to the
-// other. The end result is that each instance will now have a reference count of 2. For example,
-// the two strong references for the Tenant instances are held by 'bill' and the 'tenant'
-// property inside the 'number73' apartment.
 //
-// Note the "!" symbols for forced unwrapping (covered in an earlier section):
+// 這個動作將會創建一個強參考循環，因為每個實體都會擁有對彼此的參考。最後的結果就是每個實體現在持有的參考計數數目
+// 都是 2。例如，Tenant 實體所擁有的 2 個強參考，分別是參考了 Tenant 實體的 'bill' 以及參考了 'number73'
+// 變數的屬性 'tenant'
+//
+// 變數後方的 "!" 符號表示強制解開這些可選型別(在先前的章節中提過)：
 bill!.apartment = number73
 number73!.tenant = bill
 
-// If we try to clean up, the memory will not be deallocated by ARC. Let's follow along what
-// actually happens a step at a time.
+// 如果我們試著釋放這些使用的資源，記憶體將不會被自動參考計數完整地釋放。讓我們繼續往下看看到底在每一個步驟中發生
+// 了什麼事
 //
-// First, we set 'bill' to be nil, which drops the strong reference count for this instance of
-// Tenant down to 1. Since there is still a strong reference held to this instance, it is never
-// deallocated (and the deinit() is also never called on that instance of Person.)
+// 首先，我們將 'bill' 變數賦值為 nil，這個動作會將此實體的強參考計數數目減為 1 個。因為實體內部的屬性依然持有
+// 一份強參考計數，因此那一份記憶體將永無釋放的機會。(而且 Person 解構器的實體也不會被呼叫)
 bill = nil
 
-// Next we do the same for 'number73' dropping the strong reference count for this instance of
-// Apartment down to 1. Similarly, it is not deallocated or deinitialized.
+// 下一步我們在 'number73' 變數上做一樣的操作，將它的強參考計數數目減為 1 個。同樣地，這並不會釋放所有使用的記
+// 憶體或呼叫解構器
 number73 = nil
 
-// At this point, we have two instances that still exist in memory, but cannot be cleaned up
-// because we don't have any references to them in order to solve the problem.
+// 至此，我們在記憶體中擁有兩個依然存在的實體，但因為我們未持有任何指向它們的參考，所以無法釋放它們所使用的資源
 
 // ------------------------------------------------------------------------------------------------
-// Resolving Strong Reference Cycles between Class Instances
+// 解除在類別實體間的強參考循環
 //
-// Swift provides two methods to resolve strong reference cycles: weak and unowned references.
+// Swift 提供了兩個方法來解除類別實體間的強參考循環：弱參考以及無主參考
 
 // ------------------------------------------------------------------------------------------------
-// Weak references allow an instance to be held without actually having a strong hold on it (and
-// hence, not incrementing the reference count for the target object.)
+// 弱參考也能參考實體，但它們不是強參考，也不會牢牢地持有對實體的參考(因此，目標實體的參考計數數目不會增加)
 //
-// Use weak references when it's OK for a reference to become nil sometime during its lifetime.
-// Since the Apartment can have no tenant at some point during its lifetime, a weak reference
-// is the right way to go.
+// 當一個變數在它的生命週期中，值偶爾會是 nil 的時候，使用弱參考。因為 Apartment 有時候沒有 tenant，使用弱參
+// 考就是一個正確的方式
 //
-// Weak references must always be optional types (because they may be required to be nil.) When
-// an object holds a weak reference to an object, if that object is ever deallocated, Swift will
-// locate all the weak references to it and set those references to nil.
+// 弱參考必須是可選型別(因為它們的值有時候是 nil)。當一個物件持有指向另一個物件的弱參考時，如果被持有的物件被釋放
+// 了，Swift 將會把所有指向這個物件的弱參考值都設為 nil
 // 
-// Weak references are declared using the 'weak' keyword.
+// 使用 'weak' 關鍵字來宣告弱參考
 //
-// Let's fix our Apartment class. Note that we only have to break the cycle. It's perfectly
-// fine to let the Tenant continue to hold a strong reference to our apartment. We will also
-// create a new Tenant class (we'll just give it a new name, "NamedTenant"), but only so that we
-// can change the apartment type to reference our fixed Apartment class.
+// 讓我們修改一下 Apartment 類別。注意，我們只需要破壞掉參考循環即可。讓 Tenant 繼續持有 apartment 的強參考
+// 是完全沒問題的。我們也將創建一個新的 Tenant 類別(只是給它一個新名字 "NamedTenant")，但唯有如此，我們才能將
+// apartment 型別修改為參考新的 FixedApartment 類別
 class NamedTenant
 {
 	let name: String
@@ -136,47 +123,40 @@ class FixedApartment
 	init (number: Int) { self.number = number }
 }
 
-// Here is our new tenant and his new apartment.
+// 這裡是我們的新 tenant 實體 'jerry'，以及它擁有的新 apartment 實體 'number74'：
 //
-// This will create a single strong reference to each:
+// 這兩行會替個別的實體創建單一的強參考到個別的類別：
 var jerry: NamedTenant? = NamedTenant(name: "Jerry")
 var number74: FixedApartment? = FixedApartment(number: 74)
 
-// Let's link them up like we did before. Note that this time we're not creating a new strong
-// reference to the NamedTenant so the reference count will remain 1. The FixedApartment
-// however, will have a reference count of 2 (because the NamedTenant will hold a strong reference
-// to it.)
+// 跟先前一樣，讓我們把這兩個實體聯結起來。注意，這次我們不會替 'number74' 的屬性 'tenant' 創建一個新的強參考
+// ，所以它的參考計數數目依然是 1。然而，'jerry' 依然擁有數目為 2 的參考計數數目(因為它的 'apartment' 屬性會
+// 持有一個指向 'number74' 的強參考)
 jerry!.apartment = number74
 number74!.tenant = jerry
 
-// At this point, we have one strong reference to the NamedTenant and two strong references to
-// FixedApartment.
+// 至此，我們擁有一個指向 NamedTenant 類別的強參考，擁有兩個指向 FixedApartment 類別的強參考
 //
-// Let's set jerry to nil, which will drop his reference count to 0 causing it to get
-// deallocated. Once this happens, it is also deinitialized.
+// 讓我們將 'jerry' 設為 nil，這將把參考計數的數目設為 0 導致這個實體被釋放。當這件事發生時，它也會被解構
 jerry = nil
 
-// With 'jerry' deallocated, the strong reference it once held to FixedApartment is also cleaned
-// up leaving only one strong reference remaining to the FixedApartment class.
+// 隨著 'jerry' 的解構，被 FixedApartment 持有的強參考數目也會被減少到剩下 1 個，只剩參考這個類別本身的變數
+// 'number74'
 //
-// If we clear 'number74' then we'll remove the last remaining strong reference:
+// 如果我們釋放掉 'number74'，那麼我們將把最後剩餘的強參考數目也移除：
 number74 = nil
 
 // ------------------------------------------------------------------------------------------------
-// Unowned References
+// 無主參考
 //
-// Unowned refernces are similar to weak references in that they do not hold a strong reference
-// to an instance. However, the key difference is that if the object the reference is deallocated
-// they will not be set to nil like weak references to. Therefore, it's important to ensure that
-// any unowned references will always have a value. If this were to happen, accessing the unowned
-// reference will trigger a runtime error. In fact, Swift guraantees that your app will crash in
-// this scenario.
+// 無主參考就像是弱參考一樣，它們不會牢牢地持有對實體的參考。然而，它跟弱參考之間最主要的差別，在於如果某物件的參
+// 考被解構了，它裡頭的無主參考將不會像弱參考一樣被設為 nil。因此，確保這個擁有無主參考的實體存在性是很重要的。如
+// 果存取一個被釋放了的實體中的無主參考，會發生執行階段錯誤。事實上，Swift 擔保了你的 app 在這情況下一定會崩潰
 //
-// Unowned references are created using the 'unowned' keyword and they must not be optional.
+// 使用關鍵字 'unowned' 來創建無主參考，它們絕不能是可選型別
 //
-// We'll showcase this with a Customer and Credit Card. This is a good example case because a
-// customer may have the credit card, or they may close the account, but once a Credit Card
-// has been created, it will always have a customer.
+// 我們使用 Customer 以及 CreditCard 兩個類別當例子。這是個挺好的例子，因為 Customer 不一定會有 CreditCard
+// 。但當 CreditCard 被創建出來的時候，它一定屬於某個 Customer
 class Customer
 {
 	let name: String
@@ -192,7 +172,7 @@ class CreditCard
 	let number: Int
 	unowned let customer: Customer
 	
-	// Since 'customer' is not optional, it must be set in the initializer
+    // 因為 'customer' 屬性不是可選型別，它必須在建構器中被初始化
 	init (number: Int, customer: Customer)
 	{
 		self.number = number
@@ -201,22 +181,20 @@ class CreditCard
 }
 
 // ------------------------------------------------------------------------------------------------
-// Unowned References and Implicitly Unwrapped Optional Properties
+// 無主參考以及隱式地解開可選型別
 //
-// We've covered two common scenarios of cyclic references, but there is a third case. Consider
-// the case of a country and its capital city. Unlike the case where a customer may have a credit
-// card, or the case where an apartment may have a tenant, a country will always have a capital
-// city and a capital city will always have a tenant.
+// 我們已涵蓋了兩種在一般參考循環中會遇到的情況，但這兒有第三種情況。考慮一個 Country 以及它擁有的 capitalCity
+// 屬性。跟 Customer 不一定擁有 CreditCard，或者是 Apartment 不一定被哪個 Tenant 所持有不同，Country 一定
+// 會有 capitalCity，而一個 capitalCity 也必定有包含它的 Country
 //
-// The solution is to use an unowned property in one class and an implicitly unwrapped optional
-// property in the other class. This allows both properties to be accessed directly (without
-// optional unwrapping) once initialization is complete, while avoiding the reference cycle.
+// 這個情況要在其中一個類別中使用無主參考，而在另一個類別中隱式地解開可選型別。這個做法允許兩個屬性都能被直接存取(
+// 不需要解開可選型別)。當初始化完成後，就避開了參考循環
 //
-// Let's see how this is done:
+// 讓我們看看這是如何完成的：
 class Country
 {
 	let name: String
-	let capitalCity: City!
+	var capitalCity: City!
 	
 	init(name: String, capitalName: String)
 	{
@@ -237,49 +215,40 @@ class City
 	}
 }
 
-// We can define a Country with a capital city
+// 我們可以定義一個帶著 capitalCity 的 Country 類別實體
 var america = Country(name: "USA", capitalName: "Washington DC")
 
-// Here's how and why this works.
+// 這裡會解釋它是怎麼運作的，以及為什麼這麼做
 //
-// The relationship between Customer:CreditCard is very similar to the relationship between
-// Country:City. The two key differences are that (1) the country initializes its own city and the
-// country does not need to reference the city through the optional binding or forced unwrapping
-// because the Country defines the city with the implicitly unwrapped optional property (using the
-// exclamation mark on the type annotation (City!).
+// 在 Customer:CreditCard 之間的關係與在 Country:City 之間的關係類似。主要的差異在於 Country 類別在初始化
+// 它的 capitalCity 時，不需要透過可選綁定或強制解開去參考 City 類別，因為 Country 類別使用了一個定義為隱式解
+// 開可選型別的 capitalCity 屬性(在變數的型別後方加上驚嘆號 !)
 //
-// The City uses an unowned Country property in the same way (and for the same reasons) as the
-// CreditCard uses an unowned property of a Customer.
+// City 類別在 country 屬性上使用了無主參考，就跟 CreditCard 類別在 customer 屬性上使用了無主參考道理相同
 //
-// The Country still uses an optional (though implicitly unwrapped) for the same reason that the
-// Customer uses an optional to store a CreditCard. If we look at Country's initializer, we see
-// that it initializes a capitalCity by passing 'self' to the City initializer. Normally, an
-// initializer cannot reference its own 'self' until it has fully initialized the object. In this
-// case, the Country can access its own 'self' because once 'name' has been initialized, the object
-// is considered fully initialized. This is the case because 'capitalCity' is an optional.
+// Country 類別仍然在 capitalCity 屬性上使用了一個可選型別(透過隱式解開)，就跟 Customer 類別在 card 屬性上
+// 使用了一個可選型別道理相同。如果我們好好看看 Country 類別的建構器就會發現，它使用了一個 'self' 關鍵字來將自
+// 己傳遞進 City 類別的初始化建構器。一般而言，一個建構器不能使用 'self' 來存取它自己，除非它已初始化完成。在此
+// 例子中可以這麼做的原因在於當 Country 類別中的 'name' 屬性被初始化了，整個實體就被當作初始化完畢了，因為
+// 'capitalCity' 是一個可選型別
 //
-// We take this just a step further by declaring 'capitalCity' to be an implicitly unwrapped
-// optinoal property so that we can avoid having to deal with unwrapping 'capitalCity' whenever we
-// want to access it.
+// 我們再進一步地將可選型別的 'capitalCity' 屬性宣告為隱式解開，所以避免了每次在使用 'capitalCity' 之前，都
+// 必須先將它解開的規定
 
 // ------------------------------------------------------------------------------------------------
-// Strong Reference Cycles for Closures
+// 閉包引起的強參考循環
 //
-// We've seen how classes can reference each other creating a cyclic reference because classes are
-// reference types. However, classes aren't the only way to create a cyclic reference. These
-// problematic references can also happen with closures because they, too, are reference types.
+// 因為類別是參考型別，所以我們已看過類別會因為互相參考而引起一個參考循環。然而，類別不是唯一一個會引起參考循環的
+// 型別。這些互相參考的問題也會在閉包中發生，因為閉包也是參考型別
 //
-// This happens when a closure captures an instance of a class (simply because it uses the class
-// reference within the closure) and a class maintains a reference to the closure. Note that the
-// references that a closure captures are automatically strong references.
+// 當一個閉包捕獲了一個類別實體(僅僅只是在這個閉包裡頭使用了這個類別實體)，而此類別也保存了這個閉包的參考，就會發
+// 生參考循環。注意，閉包所捕獲的參考會被自動視為強參考
 //
-// Let's see how this problem can manifest. We'll create a class that represents an HTML element
-// which includes a variable (asHTML) which stores a reference to a closure.
+// 讓我們看看如何表達這個問題。我們將創建一個代表 HTML 元素的類別，此類別中擁有一個型別為閉包的屬性(asHTML)
 //
-// Quick note: The asHTML variable is defined as lazy so that it can reference 'self' within the
-// closure. Try removing the 'lazy' and you'll see that you get an error trying to access 'self'.
-// This is an error because we're not allowed to access 'self' during Phase 1 initialization. By
-// making 'asHTML' lazy, we solve this problem by deferring its initialization until later.
+// 速記：asHTML 屬性被定義為 lazy，所以它可以在自己的閉包中使用 'self' 關鍵字來存取同類別的屬性。試著將 'lazy'
+// 關鍵字移除，你會發現無法在第一階段的初始化中存取 'self'。我們將 'asHTML' 宣告為 lazy 後，此屬性的初始化過
+// 程可以往後延遲到被存取的時候，藉此來解決 Swift 認為類別尚未全被初始化完成的問題
 class HTMLElement
 {
 	let name: String
@@ -304,44 +273,39 @@ class HTMLElement
 	}
 }
 
-// Let's use the HTMLElement. We'll make sure we declare it as optional so we can set it to 'nil'
-// later.
+// 讓我們來使用這個 HTMLElement 類別。我們將之宣告為可選型別，以便在之後可將它的值設為 nil
 var paragraph: HTMLElement? = HTMLElement(name: "p", text: "Hello, world")
 paragraph!.asHTML()
 
-// At this point, we've created a strong reference cycle between the HTMLElement instance and the
-// asHTML closure because the closure references the object which owns [a reference to] it.
+// 至此，我們已創建了一個在 HTMLElement 實體與 asHTML 閉包之間的強參考循環，因為閉包參考了擁有(參考到)此閉包的
+// 實體
 //
-// We can set paragraph to nil, but the HTMLElement will not get deallocated:
+// 我們可以將 paragraph 設置為 nil，但 HTMLElement 實體將不會被解構：
 paragraph = nil
 
-// The solution here is to use a "Closure Capture List" as part of the closure's definition. This
-// essentially allows us to modify the default behavior of closures using strong references for
-// captured instances.
+// 這裡的解決方法，使用了在閉包型別定義中的 '閉包捕獲列表'。實質上允許我們修改閉包默認使用強參考來捕獲實體的行為
 //
-// Here's how we define a capture list:
+// 這兒展示了我們如何定義一個捕獲列表：
 //
-//	lazy var someClosure: (Int, String) -> String =
+//	lazy var 閉包名稱: (Int, String) -> String =
 //	{
 //		[unowned self] (index: Int, stringToProcess: String) -> String in
 //
-//		// ... code here ...
+//		// ... 表達式 ...
 //	}
 //
-// Some closures can used simplified syntax if their parameters are inferred while other closures
-// may not have any parameters. In both cases the method for declaring the capture list doesn't
-// change much. Simply include the capture list followed by the 'in' keyword:
+// 有些閉包可使用簡化的語法，其中一部份閉包的參數可以透過自動推斷而得，另一部份的閉包則是沒有任何參數。在這兩種情
+// 況下宣告一個捕獲列表的方式也差不多。在閉包捕獲列表後緊接著的就是 'in' 關鍵字
 //
-//	lazy var someClosure: () -> String =
+//	lazy var 閉包名稱: () -> String =
 //	{
 //		[unowned self] in
 //
-//		// ... code here ...
+//		// ... 表達式 ...
 //	}
 //
-// Let's see how we can use this to resolve the HTMLElement problem. We'll create a new class,
-// FixedHTMLElement which is identical to the previous with the exception of the addition of the
-// line: "[unowned self] in"
+// 讓我們看看如何使用這個捕獲列表來解決 HTMLElement 的問題。我們將創建一個新的類別 FixedHTMLElement，它除了
+// 一行新增的捕獲列表 "[unowned self] in" 外，跟前一個類別完全相同
 class FixedHTMLElement
 {
 	let name: String
@@ -367,5 +331,4 @@ class FixedHTMLElement
 	}
 }
 
-// Playgrounds do not allow us to test/prove this, so feel free to plug this into a compiled
-// application to see it in action.
+// 遊樂場無法讓我們檢查/證明這個有沒有效，所以請隨意地將這些程式碼放到一個新專案中，編譯後測試實際效果如何
