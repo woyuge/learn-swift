@@ -1,16 +1,12 @@
 // ------------------------------------------------------------------------------------------------
-// Things to know:
+// 本篇須知：
 //
-// * Optional Chaining is the process of safely referencing a series of optionals (which contain
-//   optionals, which contain optionals, etc.) without having to perform the optional unwrapping
-//   checks at each step along the way.
+// * 可選鏈(Optional Chaining)是一個不需要一步步地解開可選型別，就能安全地參考一連串可選型別的處理過程
 // ------------------------------------------------------------------------------------------------
 
-// Consider a case of forced unwrapping like "someOptional!.someProperty". We already know that
-// this is only safe if we know that the optional will never be nil. For times that we don't know
-// this, we must check the optional before we can reference it. This can become cumbersome for
-// situations where many optionals are chained together as properties of properties. Let's create
-// a series of optionals to show this:
+// 考慮一個強制展開如 "someOptional!.someProperty" 這個可選型別的過程。我們已經了解除非這個可選型別不為 nil，
+// 此次的展開才是安全地操作。但通常我們不曉得可選型別的內容裡頭是否有值，所以在使用之前必須先做確認。這個過程在許多
+// 可選型別鏈接一起－例如屬性的屬性－的時候，整個判斷過程會顯得很笨重。讓我們創建一連串的可選型別來展示這個情況：
 class Artist
 {
 	let name: String
@@ -45,47 +41,42 @@ class Person
 	}
 }
 
-// Here, we'll create a working chain:
+// 我們在這兒創建整個鏈
 var someArtist: Artist? = Artist(name: "Somebody with talent")
 var favSong: Song? = Song(name: "Something with a beat", artist: someArtist)
 var musicPrefs: MusicPreferences? = MusicPreferences(favoriteSong: favSong)
 var person: Person? = Person(name: "Bill", musicPreferences: musicPrefs)
 
-// We can access this chain with forced unwrapping. In this controlled environment, this will work
-// but it's probably not advisable in a real world situation unless you're sure that each member
-// of the chain is sure to never be nil.
+// 我們可以使用強制解開來存取這個鏈。在這個可控的情況下做這種操作沒有關係，但此作法在真實情況下不一定可取，除非你能
+// 確定鏈中的每一個值都不是 nil
 person!.musicPreferences!.favoriteSong!.artist!
 
-// Let's break the chain, removing the user's music preferences:
+// 讓我們破壞掉這個鏈，先移除 person 的 musicPreferences 的參考：
 if var p = person
 {
 	p.musicPreferences = nil
 }
 
-// With a broken chain, if we try to reference the arist like before, we will get a runtime error.
+// 以破壞掉的鏈而言，如果我們像先前一樣試著去參考 arist，我們將會得到一個執行階段錯誤
 //
-// The following line will compile, but will crash:
+// 下面這一行可編譯，但執行時會引發錯誤：
 //
 //		person!.musicPreferences!.favoriteSong!.artist!
 //
-// The solusion here is to use optional chaining, which replaces the forced unwrapping "!" with
-// a "?" character. If at any point along this chain, any optional is nil, evaluation is aborted
-// and the entire result becomes nil.
+// 這個情況就需要使用可選鏈來解決問題，使用問號 "?" 取代強制解開的符號 "!"。如果任何這個鏈中的可選型別的值為 nil
+// ，程式對鏈的運算將會中斷，整個表達式的結果將會回傳 nil
 //
-// Let's see this entire chain, one step at a time working backwards. This let's us see exactly
-// where the optional chain becomes a valid value:
+// 讓我們看看這整個鏈，一次一步的往前追。這可以讓我們了解整個可選鏈究竟是如何變成有效的值：
 person?.musicPreferences?.favoriteSong?.artist
 person?.musicPreferences?.favoriteSong
 person?.musicPreferences
 person
 
-// Optional chaining can be mixed with non-optionals as well as forced unwrapping and other
-// contexts (subcripts, function calls, return values, etc.) We won't bother to create the
-// series of classes and instances for the following example, but it should serve as a valid
-// example of how to use optional chaining syntax in various situations. Given the proper context
-// this line of code would compile and run as expected.
+// 可選鏈可以跟不是可選型別的變數、強制解開的可選型別以及其他內文(下標腳本，函式呼叫，回傳值)一起使用，我們不用特地費
+// 心地創建一連串的類別與實體來展示下面的例子，但此例子確實展示了如何在不同狀況下，有效地使用可選鏈的語法。搭配正確的
+// 內容之後，下面的這一行例子不但可以編譯，而且執行結果也符合預期
 //
 // person?.musicPreferences?[2].getFavoriteSong()?.artist?.name
 //
-// This line could be read as: optional person's second optional music preference's favorite song's
-// optional artist's name.
+// 解讀這一行的方法為：取得 person(可選型別) 的第三個 musicPreferences(可選型別) 的喜愛歌曲(可選型別) 的 artist
+// (可選型別) 的名字
