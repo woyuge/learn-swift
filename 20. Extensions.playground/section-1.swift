@@ -1,40 +1,38 @@
 // ------------------------------------------------------------------------------------------------
-// Things to know:
+// 本篇須知：
 //
-// * Similar to Objective-C categories, extensions allow you to add functionality to an existing
-//   type (class, struct, enumeration.)
+// * 類似於 Objective-C 中的分類(categories)，擴展(extension)允許你為已有的型別(類別、結構、列舉)，增加新的
+//   功能
 //
-// * You do not need access to the original source code to extend a type.
+// * 你不需要修改原本的程式碼就可以擴展一個型別
 //
-// * Extensions can be applied to built-in types as well, including String, Int, Double, etc.
+// * 擴展也可以使用在內建的型別上，包含 String、Int、Double 等等
 //
-// * With extensions, you can:
+// * 擴展可以讓你：
 //
-//   o Add computed properties (including static)
-//   o Define instance methods and type methods
-//   o Provide new convenience initializers
-//   o Define subscripts
-//   o Define and use new nested types
-//   o Make an existing type conform to a protocol
+//   o 增加計算屬性(包含靜態屬性)
+//   o 定義實體方法以及型別方法
+//   o 提供新的便利建構器
+//   o 定義下標腳本
+//   o 定義且使用新的巢狀結構型別
+//   o 讓既存的型別符合某個協定
 //
-// * Extensions do not support adding stored properties or property observers to a type.
+// * 擴展並不支援替一個型別增加儲存屬性或屬性監視器
 //
-// * Extensions apply all instances of a type, even if they were created before the extension was
-//   defined.
+// * 擴展會套用在所擴展型別的每一個實體上，即使這個實體是在擴展前就宣告完成的
 // ------------------------------------------------------------------------------------------------
 
-// Let's take a look at how extensions are declared. Note that, unlike Objective-C categories,
-// extensions are not named:
+// 讓我們看看擴展是如何宣告的。注意，不像 Objective-C 的分類，擴展是沒有名稱的：
 extension Int
 {
-	// ... code here
+	// ... 表達式
 }
 
 // ------------------------------------------------------------------------------------------------
-// Computed properties
+// 計算屬性
 //
-// Computed properties are a poweful use of extensions. Below, we'll add native conversion from
-// various measurements (Km, mm, feet, etc.) to the Double class.
+// 計算屬性是擴展最能發揮它強大功能的地方。下面，我們為 Double 型別增加各種(Km, mm, feet, 等等)不同的原生的轉
+// 換支援
 extension Double
 {
 	var kmToMeters: Double { return self * 1_000.0 }
@@ -44,19 +42,18 @@ extension Double
 	var ftToMeters: Double { return self / 3.28084 }
 }
 
-// We can call upon Double's new computed property to convert inches to meters
+// 我們可以呼叫 Double 型別的新計算屬性來將 inch 轉換為 meter
 let oneInchInMeters = 1.inchToMeters
 
-// Similarly, we'll convert three feet to meters
+// 同樣的，我們可以將 3 feet 轉換到 meter
 let threeFeetInMeters = 3.ftToMeters
 
 // ------------------------------------------------------------------------------------------------
-// Initializers
+// 建構器
 //
-// Extensions can be used to add new convenience initializers to a class, but they cannot add
-// new designated initializers.
+// 可以用擴展來替類別增加新的便利建構器，但不能用來增加新的指定建構器
 //
-// Let's see this in action:
+// 讓我們看看實際應用的情況：
 struct Size
 {
 	var width = 0.0
@@ -73,12 +70,10 @@ struct Rect
 	var size = Size()
 }
 
-// Since we didn't provide any initializers, we can use Swift's default memberwise initializer for
-// the Rect.
+// 因為我們沒有主動提供任何建構器，所以可以使用 Swift 默認的針對個別成員的建構器來替 Rect 結構初始化
 var memberwiseRect = Rect(origin: Point(x: 2.0, y: 2.0), size: Size(width: 5.0, height: 5.0))
 
-// Let's extend Rect to add a new convenience initializer. Note that we're still responsible for
-// ensuring that the instance is fully initialized.
+// 讓我們擴展 Rect 結構，為它新增一個新的便利建構器。注意，我們依然必須確保整個實體的屬性都被初始化完成
 extension Rect
 {
 	init (center: Point, size: Size)
@@ -89,21 +84,20 @@ extension Rect
 	}
 }
 
-// Let's try out our new initializer:
+// 讓我們試試看這個新的便利建構器：
 let centerRect = Rect(center: Point(x: 4.0, y: 4.0), size: Size(width: 3.0, height: 3.0))
 
-// Remember that if a class has an initializer, Swift will not provide the default memberwise
-// initializer. However, since we added an initializer via an Extension, we still have access
-// to Swift's memberwise initializer:
+// 請記住，如果一個類別擁有任何自定義的建構器，Swift 將不會提供默認的針對個別成員的建構器。然而，因為我們是透
+// 過擴展來增加一個建構器，因此依然可以使用 Swift 為我們提供的針對個別成員的建構器
 var anotherRect = Rect(origin: Point(x: 1.0, y: 1.0), size: Size(width: 3.0, height: 2.0))
 
 // ------------------------------------------------------------------------------------------------
-// Methods
+// 方法
 //
-// As you might expect, we can add methods to an existing type as well. Here's a clever little
-// extention to perform a task (a closure) multiple times, equal to the value stored in the Int.
+// 正如你所期望的，我們也可以新增方法到既有的型別。這裡是一個絕妙的小擴展，它可以多次地重複一個任務(閉包)，而重
+// 複的次數就等於此 Int 型別中的儲存值
 //
-// Note that the integer value is stored in 'self'.
+// 注意，可藉由 'self' 關鍵字來存取 Int 型別中的儲存值
 extension Int
 {
 	func repititions(task: () -> ())
@@ -115,12 +109,12 @@ extension Int
 	}
 }
 
-// Let's call our new member using the shorthand syntax for trailing closures:
+// 讓我們使用簡化語法來呼叫此 Int 型別中的尾隨閉包：
 3.repititions { println("hello") }
 
-// Instance methods can mutate the instance itself.
+// 實體方法可以變異為修改實體本身
 //
-// Note the use of the 'mutating' keyword.
+// 注意，使用了 'mutating' 關鍵字
 extension Int
 {
 	mutating func square()
@@ -130,12 +124,12 @@ extension Int
 }
 
 var someInt = 3
-someInt.square() // someInt is now 9
+someInt.square() // someInt 現在的值是 9
 
 // ------------------------------------------------------------------------------------------------
-// Subscripts
+// 下標腳本
 //
-// Let's add a subscript to Int:
+// 讓我們替 Int 型別增加一個下標腳本：
 extension Int
 {
 	subscript(digitIndex: Int) -> Int
@@ -149,7 +143,7 @@ extension Int
 	}
 }
 
-// And we can call our subscript directly on an Int, including a literal Int type:
+// 並且我們可以直接呼叫這個 Int 型別的下標腳本，包括直接使用數字型態的 Int
 123456789[0]
 123456789[1]
 123456789[2]
@@ -159,9 +153,9 @@ extension Int
 123456789[6]
 
 // ------------------------------------------------------------------------------------------------
-// Nested types
+// 巢狀結構型別
 //
-// We can also add nested types to an existing type:
+// 我們也可以替既有的型別增加一個巢狀結構型別的擴展
 extension Character
 {
 	enum Kind
@@ -183,7 +177,7 @@ extension Character
 	}
 }
 
-// Let's test out our new extension with nested types:
+// 讓我們測試一下這個裡頭有巢狀結構型別的擴展：
 Character("a").kind == .Vowel
 Character("h").kind == .Consonant
 Character("+").kind == .Other
