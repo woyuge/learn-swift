@@ -1,70 +1,64 @@
 // ------------------------------------------------------------------------------------------------
-// Things to know:
+// 本篇須知：
 //
-// * Protocols define a required set of functionality (including methods and properties) for a
-//   class, structure or enumeration.
+// * 協定(protocol)為類別、結構或列舉定義一個功能所需要的一組方法及屬性
 //
-// * Protocols are "adopted" by a class, structure or enumeration to provide the implementation.
-//   This is called "conforming" to a protocol.
+// * 協定可被類別、結構或列舉中的實作所"遵循"，這被稱為"滿足"一個協定
 //
-// * As you should already be aware, protocols are often used for delegation.
+// * 正如你應該已經知道的，協定常被使用在代理(delegation)上
 //
-// * Protcol Syntax looks like this:
+// * 協定的語法看起來像這樣：
 //
-//		protocol SomeProtocol
+//		protocol 協定的名稱
 //		{
-//			// protocol definition goes here
+//          // 這裡是此協定的定義
 //		}
 //
-// * Protocol adoption looks like this:
+// * 遵循協定的類別、結構或列舉看起來像這樣：
 //
-//		struct SomeStructure: FirstProtocol, AnotherProtocol
+//		struct 結構的名稱: 第一個協定名稱, 另一個協定名稱
 //		{
-//			// structure definition goes here
+//			// 這裡是此結構的定義
 //		}
 //
-//		class SomeClass: SomeSuperclass, FirstProtocol, AnotherProtocol
+//		class 類別的名稱: 繼承的父類別名稱, 第一個協定名稱, 另一個協定名稱
 //		{
-//			// class definition goes here
+//			// 這裡是此類別的定義
 //		}
 // ------------------------------------------------------------------------------------------------
 
 // ------------------------------------------------------------------------------------------------
-// Property requirements
+// 屬性要求
 //
-// * A protocol can require the conforming type to provide an instance of a property or type
-//   property.
+// * 一個協定可以要求遵循它的型別實體提供一個屬性或者是型別屬性
 //
-// * The protocol can also specify if the property must be gettable or gettable and
-//   settable. If a protocol only requires a gettable property, the conforming class can use
-//   a stored property or a computed property. Also, the conforming class is allowed to add
-//   a setter if it needs.
+// * 協定也可以指定一個屬性必須是唯讀或者是讀寫。如果協定只需要唯讀屬性，那麼遵循此協定的類別可以使用儲存屬性或者
+//   是計算屬性。另外，如果需要的話，遵循此協定的類別也被允許增加 setter 方法
 //
-// * Property requirements are always declared as variable types with the 'var' introducer.
+// * 屬性要求總是使用 'var' 關鍵字來宣告為變數型別
 //
-// Let's take a look at a simple protocol. As you'll see, we only need to define the properties
-// in terms of 'get' and 'set' and do not provide the actual functionality.
+// 讓我們一起來看看這個簡單的協定。正如你將見到的，我們只需要定義一個屬性是 'get' 或 'set'，而不需要提供它實際
+// 的功能
 protocol someProtocolForProperties
 {
-	// A read/write property
+    // 一個讀/寫屬性
 	var mustBeSettable: Int { get set }
 	
-	// A read-only property
+    // 一個唯讀屬性
 	var doesNotNeedToBeSettable: Int { get }
 	
-	// A type property always uses 'class'. This is the case even if adopted by a structure or
-	// enumeration which will use 'static' when conforming to the protocol's property.
-	class var someTypeProperty: Int { get set }
+    // 使用 'static' 關鍵字來定義一個型別屬性
+	static var someTypeProperty: Int { get set }
 }
 
-// Let's create a more practical protocol that we can actually conform to:
+// 讓我們創建一個待會可以真的來遵循的實際協定：
 protocol FullyNamed
 {
 	var fullName: String { get }
 }
 
-// A structure that conforms to FullyNamed. We won't bother creating an explicit getter or setter
-// for the 'fullName' property because Swift's defaults will suffice.
+// 一個遵循 FullyNamed 協定的結構。我們不用特別費心地為了 'fullName' 屬性創建 getter 或 setter 函式，因為
+// 默認 Swift 就會滿足這個需求
 struct Person: FullyNamed
 {
 	var fullName: String
@@ -72,7 +66,7 @@ struct Person: FullyNamed
 
 let john = Person(fullName: "John Smith")
 
-// Let's try a more complex class
+// 讓我們試試另一個更複雜的類別
 class Starship: FullyNamed
 {
 	var prefix: String?
@@ -89,35 +83,32 @@ class Starship: FullyNamed
 	}
 }
 
-// In the class above, we use a 'name' and an optional 'prefix' to represent the full name, then
-// provide a computed value to fulfill our 'fullName' requirement.
+// 在以上的類別中，我們使用 'name' 以及一個可選型別 'prefix' 來代表一個完整的名字，然後提供一個計算屬性來遵循
+// 這個 'fullName' 屬性的需求
 //
-// Here it is in action:
+// 這裡是實際使用的狀況：
 var ncc1701 = Starship(name: "Enterprise", prefix: "USS")
 ncc1701.fullName
 
 // ------------------------------------------------------------------------------------------------
-// Method Requirements
+// 方法要求
 //
-// Similar to property requirements, the protocol only defines the method type, not the
-// implementation.
+// 跟屬性要求類似，協定只有指定方法的型別，而沒有指定方法的實作
 //
-// Variadic parameters are allowed, but default values are not.
+// 可以使用可變參數，但不能使用有默認值的參數
 //
-// Method requirements can be mutating - simply use the 'mutating' keyword before the function
-// definition. Note that when conforming to the protocol, only classes are required to use the
-// 'mutating' keyword when conforming to the protocol, following the normal procedure.
+// 方法要求可以被變異 - 只要在函式定義名稱前使用 'mutating' 關鍵字即可。注意，當遵循這個協定的時候，只有類別不
+// 需要使用 'mutating' 關鍵字，結構以及列舉都要加上這個關鍵字
 //
-// As with property requirements, type methods are always prefixed with the 'class' keyword.
+// 正如屬性要求，型別方法前必須增加 'static' 關鍵字
 //
-// Here's a simple example that defines the requirements for a 'random' function which takes
-// no parameters and returns a Double:
+// 這裡是一個簡單的協定，它定義了一個不需要任何傳入參數的 'random' 方法，它會回傳一個 Double 型別
 protocol RandomNumberGenerator
 {
 	func random() -> Double
 }
 
-// Let's adopt this protocol:
+// 讓我們遵循這個協定：
 class LinearCongruentialGenerator: RandomNumberGenerator
 {
 	var lastRandom = 42.0
@@ -136,17 +127,16 @@ generator.random()
 generator.random()
 
 // ------------------------------------------------------------------------------------------------
-// Protocols as Types
+// 將協定當作型別
 //
-// Protocols are types, which means they can be used where many other types are allowed,
-// including:
+// 協定也可以被當作型別來處理，這代表它們可以被使用在許多允許使用型別的地方，包含了：
 //
-// * As a parameter to a function, method or initializer
-// * As the type of a constant, variable or property
-// * As the type of items in an Array, Dictionary or other container
+// * 當作參數被傳遞進一個函式、方法或建構器
+// * 當做一個常數、變數或屬性的型別
+// * 當作一個陣列、字典或其他容器中元素的型別
 //
-// Here's a protocol used as a type. We'll create a Dice class that stores a RandomNumberGenerator
-// as a constant so that it can be used to customize the randomization of the dice roll:
+// 這兒是一個將協定當作型別使用的例子。我們將創建一個 Dice 類別用來儲存一個型別為 RandomNumberGenerator 的常
+// 數屬性，此屬性可被用來自定義擲骰的結果：
 class Dice
 {
 	let sides: Int
@@ -163,7 +153,7 @@ class Dice
 	}
 }
 
-// Just for fun, let's roll a few:
+// 只是為了娛樂一下，讓我們擲擲骰子吧：
 let d6 = Dice(sides: 6, generator: generator)
 d6.roll()
 d6.roll()
@@ -173,17 +163,17 @@ d6.roll()
 d6.roll()
 
 // ------------------------------------------------------------------------------------------------
-// Adding Protocol Conformance with an Extension
+// 透過擴展來遵循協定
 //
-// Existing classes, structures and enumerations can be extended to conform to a given protocol.
+// 既存的類別、結構以及列舉可以透過擴展來遵循特定的協定
 //
-// Let's start with a simple protocol we'll use for expirimentation:
+// 讓我們從一個打算拿來實驗的簡單協定開始：
 protocol TextRepresentable
 {
 	func asText() -> String
 }
 
-// We'll extend our Dice class:
+// 我們可以透過擴展 Dice 類別來遵循協定
 extension Dice: TextRepresentable
 {
 	func asText() -> String
@@ -192,21 +182,19 @@ extension Dice: TextRepresentable
 	}
 }
 
-// Existing instances (such as 'd6' will automatically adopt and conform to the new protocol, even
-// though it was declared prior to the extension.
+// 既存的物件實體(例如 'd6')，將會自動地遵循這個新的協定， 即使這個實體在做擴展前就已經宣告完成了
 d6.asText()
 
 // ------------------------------------------------------------------------------------------------
-// Declaring Protocol Adoption with an Extension
+// 使用擴展來宣告欲遵循的協定
 //
-// Some types may already adopt a protocol, but do not state so in their definition. Types do not
-// automatically adopt to protocols whose requirements they satisfy - protocol adoption must
-// always be stated explicitly.
+// 有一些型別已經遵循了協定，但尚未在它們的定義中宣告。型別將不會自動遵循它們必須滿足的協定要求－要遵循的協定必須
+// 總是被顯式地宣告出來
 //
-// This can be resolved with by using an empty extension.
+// 這個情況可以使用空的擴展來解決
 //
-// To showcase this, let's create a structure that conforms to the TextRepresentable protocol, but
-// doesn't include this as part of the definition:
+// 為了展示這個例子，讓我們創建一個滿足了 TextRepresentable 協定的結構，但在宣告結構時，不在結構名稱的後方指定
+// 使用此協定：
 struct Hamster
 {
 	var name: String
@@ -216,49 +204,46 @@ struct Hamster
 	}
 }
 
-// Let's verify our work:
+// 讓我們確認一下這段程式碼：
 let tedTheHamster = Hamster(name: "Ted")
 tedTheHamster.asText()
 
-// We can add TextRepresentable conformance to Hamster by using an empty extension.
+// 我們可以使用空的擴展，增加欲遵循的 TextRepresentable 協定到 Hamster 結構
 //
-// This works because the requirements are already met, so we don't need to include any additional
-// functionality within the extension definition.
+// 這個做法會生效的原因在於我們早已滿足了所有協定的需求。所以我們不需要在擴展的定義中，包含任何多餘的功能
 extension Hamster: TextRepresentable
 {
 	
 }
 
 // ------------------------------------------------------------------------------------------------
-// Collections of Protocol Types
+// 協定型別的集合
 //
-// Hamsters and Dice don't have much in common, but in our sample code above, they both conform
-// to the TextRepresentable protocol. Because of this, we can create an array of things that are
-// TextRepresentable which includes each:
+// Hamsters 以及 Dice 類別並沒有什麼共同點，但在我們先前的範例程式碼中，它們都滿足了 TextRepresentable 協定
+// 。因為如此，我們可以創建一個包含一堆滿足了 TextRepresentable 協定的陣列來存放它們：
 let textRepresentableThigns: [TextRepresentable] = [d6, tedTheHamster]
 
-// We can now loop through each and produce its text representation:
+// 我們現在可以遍歷陣列中每一個元素並取得它們的文字表述：
 for thing in textRepresentableThigns
 {
 	thing.asText()
 }
 
 // ------------------------------------------------------------------------------------------------
-// Protocol Inheritance
+// 協定繼承
 //
-// Protocols can inherit from other protocols in order to add further requirements. The syntax
-// for this is similar to a class ineriting from its superclass.
+// 協定也可以繼承其他的協定來增加進一步的要求。這個語法近似於類別繼承的語法
 //
-// Let's create a new text representable type, inherited from TextRepresentable:
+// 讓我們創建一個繼承自 TextRepresentable 協定的 PrettyTextRepresentable 協定
 protocol PrettyTextRepresentable: TextRepresentable
 {
 	func asPrettyText() -> String
 }
 
-// Let's make our Dice a little prettier.
+// 讓我們把 Dice 類別變得更佳正點
 //
-// Note that the Dice already knows that it conforms to the TextRepresentable, which means we can
-// call asText() inside our asPrettyText() method.
+// 注意，Dice 類別總是知道它滿足了 TextRepresentable 協定，這表示我們可以在 asPrettyText() 方法中呼叫
+// asText() 方法
 extension Dice: PrettyTextRepresentable
 {
 	func asPrettyText() -> String
@@ -267,20 +252,18 @@ extension Dice: PrettyTextRepresentable
 	}
 }
 
-// We can test our work:
+// 我們現在可以測試一下這段程式碼：
 d6.asPrettyText()
 
 // ------------------------------------------------------------------------------------------------
-// Protocol Composition
+// 合成協定
 //
-// Protocols can be combined such that a type conforms to each of them. For example, a person can
-// be an aged person as well as a named person.
+// 協定可以被結合在一起使用。舉例來說，一個"人"可以是"上年紀的人"，也可以是"有名字的人"
 //
-// Protocol Composition is a syntactic method of declaring that an instance conforms to a set
-// of protocols. It takes the form "protocol<SomeProtocol, AnotherProtocol>". There can be as
-// many protocols between the angle brackets as you need.
+// 合成協定是一種讓實體滿足一組協定的語法宣告方式，它使用這個格式 "protocol<某協定, 另一個協定>"。在角括號之
+// 間無論增加多少協定都沒有關係
 //
-// Let's start by creating a couple of protocols for expirimentation:
+// 讓我們從創建 2 個用來實驗的新協定開始：
 protocol Named
 {
 	var name: String { get }
@@ -290,48 +273,47 @@ protocol Aged
 	var age: Int { get }
 }
 
-// Here, we declare an Individual that conforms to both Name and Age protocols:
+// 這兒，我們宣告一個同時滿足了 Named 以及 Aged 協定的 Individual 結構：
 struct Individual: Named, Aged
 {
 	var name: String
 	var age: Int
 }
 
-// Here, we can see the protocol composition at work as the parameter into the wishHappyBirthday()
-// function:
+// 在這兒我們可以看到合成協定在 wishHappyBirthday() 函式中發揮了它的作用：
 func wishHappyBirthday(celebrator: protocol<Named, Aged>) -> String
 {
 	return "Happy Birthday \(celebrator.name) - you're \(celebrator.age)!"
 }
 
-// If we call the member, we can see the celebratory wish for this individual:
+// 呼叫了這個函式會對 Bill 說生日快樂
 wishHappyBirthday(Individual(name: "Bill", age: 31))
 
 // ------------------------------------------------------------------------------------------------
-// Checking for Protocol Conformance
+// 協定的一致性(檢查物件是否滿足某協定)
 //
-// We can use 'is' and 'as' for testing for protocol conformance, just as we've seen in the
-// section on Type Casting.
+// 如同在型別轉換章節中看過的方法，我們也能夠使用 'is' 以及 'as' 兩個關鍵字來測試物件是否滿足某協定
 //
-// In order for this to work with protocols, they must be marked with an "@objc" attribute. See
-// further down in this playground for a special note about the @objc attribute.
+// 為了讓這個功能可以使用在協定上，協定必須要被標記為 "@objc" 屬性。此遊樂場下面的程式碼中可以看到這些特別的
+// @objc 屬性
 //
-// Let's create a new protocol with the proper prefix so that we can investigate:
+// 讓我們創建一個有著正確 @objc 前綴的新協定來試試這個功能：
 @objc protocol HasArea
 {
 	var area: Double { get }
 }
 
-class Circle: HasArea
+//class Circle: HasArea
+class Circle
 {
 	let pi = 3.14159
 	var radius: Double
-	var area: Double { return pi * radius * radius }
+	@objc var area: Double { return pi * radius * radius }
 	init(radius: Double) { self.radius = radius }
 }
 class Country: HasArea
 {
-	var area: Double
+	@objc var area: Double
 	init(area: Double) { self.area = area }
 }
 class Animal
@@ -340,7 +322,7 @@ class Animal
 	init(legs: Int) { self.legs = legs }
 }
 
-// We can store our objects into an array of type AnyObject[]
+// 我們可以使用 AnyObject 陣列來儲存所有的實體物件
 let objects: [AnyObject] =
 [
 	Circle(radius: 3.0),
@@ -348,61 +330,68 @@ let objects: [AnyObject] =
 	Animal(legs: 4)
 ]
 
-// Then we can test each for conformance to HasArea:
+// 然後我們可以檢查每一個物件是否滿足了 HasArea 協定：
 objects[0] is HasArea
 objects[1] is HasArea
 objects[2] is HasArea
 
 // ------------------------------------------------------------------------------------------------
-// Optional Protocol Requirements
+// 可選協定要求
 //
-// Sometimes it's convenient to declare protocols that have one or more requirements that are
-// optional. This is done by prefixing those requirements with the 'optional' keyword.
+// 有時候，在協定中宣告一個或多個可選型別可以帶來一些便利性。可以在協定的需求前面加上 'optional' 關鍵字來指定
+// 使用這個功能
 //
-// The term "optional protocol" refers to protocols that are optional in a very similar since to
-// optionals we've seen in the past. However, rather than stored values that can be nil, they
-// can still use optional chaining and optional binding for determining if an optional requirement
-// has been satisfied and if so, using that requirement.
+// 所謂的"可選協定"指協定中的要求是可選的，它們的運作方式與先前見過的可選型別相當類似。然而"可選協定"並非儲存一
+// 個裡頭可能是 nil 的值，它們使用可選鏈以及可選綁定來決定一個可選的要求是否已經滿足了，如果是，則使用這個要求
 //
-// As with Protocol Conformance, a protocol that uses optional requirements must also be prefixed
-// with the '@objc' attribute.
+// 至於協定的一致性，一個使用了可選要求的協定也必須在前方加上 "@objc" 屬性
 //
-// A special note about @objc attribute:
+// 關於 "@objc" 屬性的特殊注意事項：
 //
-// * In order to check if an instance of a class conforms to a given protocol, that protocol must
-//   be declared with the @objc attribute.
+// * 為了檢查一個類別實體是否滿足了指定給它的協定，這個協定必須宣告為 @objc 屬性
 //
-// * This is also the case with optional requirements in protocols. In order to use the optional
-//   declaration modifier, the protocol must be declared with the @objc attribute.
+// * 在協定中使用可選要求時也必須使用。為了在協定中使用 'optional' 關鍵字，這個協定必須宣告為 @objc 屬性
 //
-// * Additionally, any class, structure or enumeration that owns an instance that conforms to a
-//   protocol declared with the @objc attribute must also be declared with the @objc attribute.
+// * 除此之外，任何一個類別、結構或列舉只要擁有一個滿足了前方有 @objc 屬性協定的實體，那麼這個類別、結構或列舉的
+//   前方就必須加上 @objc 屬性
 //
-// Here's another simple protocol that uses optional requrements:
+// 這裡是一個簡單的，使用了可選要求的協定例子：
 @objc protocol CounterDataSource
 {
 	optional func incrementForCount(count: Int) -> Int
 	optional var fixedIncrement: Int { get }
 }
 
-// In the class below, we'll see that checking to see if an instance conforms to a specific
-// requirement is similar to checking for (and accessing) optionals. We'll use optional chaining
-// for these optional reqirements:
+// 在下面的例子中，我們將見到如何檢查一個實體是否滿足協定中的特定要求，這跟檢查(或存取)可選型別很像。我們將使用
+// 可選鏈來檢查這個可選要求：
 @objc class Counter
 {
-	var count = 0
-	var dataSource: CounterDataSource?
+    var count = 0
+	var dataSource: CounterDataSource = ThreeSource()
 	func increment()
 	{
-		// Does the dataSource conform to the incrementForCount method?
-		if let amount = dataSource?.incrementForCount?(count)
+        // dataSource 是否滿足了 incrementForCount 方法要求？
+		if let amount = dataSource.incrementForCount?(count)
 		{
 			count += amount
 		}
-		// If not, does it conform to the fixedIncrement variable requirement?
-		else if let amount = dataSource?.fixedIncrement?
+        // 如果不是，它是否滿足了 fixedIncrement 屬性要求？
+		else if let amount = dataSource.fixedIncrement
 		{
 			count += amount
 		}
 	}
 }
+
+// 建立一個滿足了 CounterDataSource 部份協定的類別 ThreeSource
+class ThreeSource: CounterDataSource {
+    let fixedIncrement = 3
+}
+
+var counter = Counter()
+counter.dataSource = ThreeSource()
+
+for _ in 1...3 {
+    counter.increment()
+}
+counter.count
