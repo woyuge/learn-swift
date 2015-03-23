@@ -1,17 +1,16 @@
 // ------------------------------------------------------------------------------------------------
-// Things to know:
+// 本篇須知：
 //
-// * Generics allow flexible, reusable functions and types that can work with any type, subject
-//   to restrictions that you define.
+// * 泛型(generic)可以根據你定義的限制，寫出可用於任何型別上的靈活的、可重複使用的函式以及型別
 //
-// * Swift's Array and Dictionary are both Generics.
+// * Swift 的陣列以及字典都是泛型
 //
-// * Generics can be applied to Functions, Structures, Classes and Enumerations.
+// * 泛型可以使用在函式、結構、類別以及列舉上
 // ------------------------------------------------------------------------------------------------
 
-// The problem that Generics solve
+// 泛型能解決的問題
 //
-// Consider the following function which can swap two Ints.
+// 考慮以下這個能交換兩個整數的函式
 func swapTwoInts(inout a: Int, inout b: Int)
 {
 	let tmp = a
@@ -19,8 +18,8 @@ func swapTwoInts(inout a: Int, inout b: Int)
 	b = tmp
 }
 
-// What if we wanted to swap Strings? Or any other type? We would need to write a lot of different
-// swap functions. Instead, let's use Generics. Consider the following generic function:
+// 如果我們想要交換字串呢？或者是任意其他型別？我們需要寫出很多不同的交換函式才行。相較這個做法，讓我們使用泛型。考慮
+// 以下這個泛型函式：
 func swapTwoValues<T>(inout a: T, inout b: T)
 {
 	let tmp = a
@@ -28,29 +27,26 @@ func swapTwoValues<T>(inout a: T, inout b: T)
 	b = tmp
 }
 
-// The 'swapTwoValues()' function is a generic function in a sense that some or all of the types
-// that it works on are generic (i.e., specific only to the calls placed on that function.)
+// 這個 'swapTwoValues()' 就是泛型函式，這代表在某種意義上，它所使用的部份的或是所有的型別都是泛型(也就是說，具體
+// 而言指的是這個函式的傳入參數)
 //
-// Study the first line of the function and notice the use of <T> and the type for 'a' and 'b' as
-// type T. In this case, T is just a placeholder for a type and by studying this function, we can
-// see that both 'a' and 'b' are the same type.
+// 仔細看看函式的第一行就能發現，我們使用了 <T>，傳入參數 'a' 與 'b' 的型別也是 T。在這個情況下，T 只是表達一個佔
+// 位符型別，而且透過這個函式，我們可以瞭解 'a' 與 'b' 的型別是相同的
 //
-// If we call this function with two Integers, it will treat the function as one declared to accept
-// two Ints, but if we pass in two Strings, it will work on Strings.
+// 如果我們使用兩個傳入的整數型別來呼叫這個函式，它將把這個函式視為接受兩個整數，但如果我們傳入兩個字串，它也可以作用
+// 在字串上
 //
-// If we study the body of the function, we'll see that it is coded in such a way as to work with
-// any type passed in: The 'tmp' parameter's type is inferred by the value 'a' and 'a' and 'b' must
-// be assignable. If any of this criteria are not met, a compilation error will appear for the
-// function call the tries to call swapTwoValues() with a type that doesn't meet this criteria.
+// 如果我們好好看看這個函式的實作部份，我們將會發現它被設計為能使用任何型別的傳入參數：裡頭的 'tmp' 變數型別是透過傳
+// 入參數 'a' 來自動推斷，而 'a' 與 'b' 這兩個參數必須是可賦值的(assignable)。如果以上任一個條件不滿足，那就會在
+// 嘗試呼叫不符合這些條件的型別時，發生編譯錯誤
 //
-// Although we're using T as the name for our type placeholder, we can use any name we wish, though
-// T is a common placeholder for single type lists. If we were to create a new implementation of
-// the Dictionary class, we would want to use two type parameters and name them effectively, such
-// as <KeyType, ValueType>.
+// 雖然我們正在使用 T 當作我們的佔位符型別，我們可以使用我們想要的任意名稱，即便 T 在單一型別的列表中，是一個常見的
+// 佔位符。如果我們創建了一個新字典類別的實作，我們可能會想使用兩個參數，並且有效地命名它們，例如
+// <KeyType, ValueType>
 //
-// A type placholder can also be used to define the return type.
+// 一個佔位符型別也可以用來定義回傳值的型別
 //
-// Let's call it a few times to see it in action:
+// 讓我們呼叫這個函式幾次，來看看它實際執行的結果：
 var aInt = 3
 var bInt = 4
 swapTwoValues(&aInt, &bInt)
@@ -70,15 +66,13 @@ aString
 bString
 
 // ------------------------------------------------------------------------------------------------
-// Generic Types
+// 泛型型別
 //
-// So far we've seen how to apply Generics to a function, let's see how they can be applied to
-// a struct. We'll define a standard 'stack' implementation which works like an array that can
-// "push" an element to the end of the array, or "pop" an element off of the end of the array.
+// 目前為止我們看到了如何在函式上使用泛型，讓我們看看要如何使用在結構上。我們可以定義一個標準的 'stack' 實作，它
+// 運作的方式就像是陣列，可以增加(push)一個元素到陣列後方，或者是從陣列後方取出(pop)一個元素
 //
-// As you can see, the type placeholder, once defined for a struct, can be used anywhere in that
-// struct to represent the given type. In the code below, the the type placeholder is used as the
-// type for a property, the input parameter for a method and the return value for a method.
+// 如同你所見到的，當宣告一個結構的時候，佔位符型別可以代表在結構中的任意型別。在下方的程式碼中，佔位符型別被使用在
+// 屬性的型別、方法中的輸入參數型別以及方法的回傳值型別
 struct Stack<T>
 {
 	var items = [T]()
@@ -92,7 +86,7 @@ struct Stack<T>
 	}
 }
 
-// Let's use our new Stack:
+// 讓我們使用看看我們的新堆疊：
 var stackOfStrings = Stack<String>()
 
 stackOfStrings.push("uno")
@@ -106,33 +100,28 @@ stackOfStrings.pop()
 stackOfStrings.pop()
 
 // ------------------------------------------------------------------------------------------------
-// Type constraints
+// 型別約束
 //
-// So far, our type parameters are completely Generic - they can represent any given type.
-// Sometimes we may want to apply constraints to those types. For example, the Swift Dictionary
-// type uses generics and places a constraint on the key's type that it must be hashable (i.e., it
-// must conform to the Hashable protocol, defined in the Swift standard library.)
+// 目前為止，我們的型別參數都是泛型－它們可以代表任何給予的型別。有時候我們會想要在這些型別上加上一些約束。例如，Swift
+// 的字典型別使用了泛型，並且為鍵值的型別加上了必須要可雜湊(hashable)的約束(也就是說，它必須滿足定義在 Swift 的標準
+// 函式庫中的雜湊協定)
 //
-// Constraints are defined with the following syntax:
+// 使用下列的語法來定義約束：
 func doSomethingWithKeyValue<KeyType: Hashable, ValueType>(someKey: KeyType, someValue: ValueType)
 {
-	// Our keyType is known to be a Hashable, so we can use the hashValue defined by that protocol
-	// shown here:
+    // 我們的 KeyType 必須要可雜湊，所以我們可以使用在協定中定義好的 hashValue 屬性：
 	someKey.hashValue
 	
-	// 'someValue' is an unknown type to us, we'll just drop it here in case it's ever used so we
-	// can see the value
+    // 'someValue' 對我們來說是個未知型別的變數，我們將它擺在這裡，以便當它一被任何人使用的時候，我們就能看到它的值
 	someValue
 }
 
-// Let's see type constraints in action. We'll create a function that finds a given value within
-// an array and returns an optional index into the array where the first element was found.
+// 讓我們看看型別約束的實際運作情況。我們將創建一個函式，它可以依據給予的值找出在給予的陣列中相應的索引，因為不一定陣列
+// 中有這個值，所以這個索引值會做為可選型別回傳
 //
-// Take notice the constraint "Equatable" on the type T, which is key to making this function
-// compile. Without it, we would get an error on the conditional statement used to compare each
-// element from the array with the value being searched for. By including the Equatable, we tell
-// the generic function that it is guaranteed to receive only values that meet that specific
-// criteria.
+// 留意我們對型別 T 所做的"可比較是否相等"(Equatable)約束，這是讓函式可以編譯的關鍵，少了它，我們將會在使用條件判斷
+// 語句來比較陣列中元素值的地方，得到一個編譯錯誤。藉著引入 Equatable 的約束，我們告訴這個泛型函式，它必須保證接收的
+// 值都要滿足這個特定的條件
 func findIndex<T: Equatable>(array: [T], valueToFind: T) -> Int?
 {
 	for (index, value) in enumerate(array)
@@ -145,17 +134,16 @@ func findIndex<T: Equatable>(array: [T], valueToFind: T) -> Int?
 	return nil
 }
 
-// Let's try a few different inputs
+// 讓我們試試幾種不同的輸入
 let doubleIndex = findIndex([3.14159, 0.1, 0.25], 9.3)
 let stringIndex = findIndex(["Mike", "Malcolm", "Andrea"], "Andrea")
 
 // ------------------------------------------------------------------------------------------------
-// Associated types
+// 關聯型別
 //
-// Protocols use a different method of defining generic types, called Associated Types, which use
-// type inference combined with Type Aliases.
+// 協定使用不同的方法來定義泛型型別，這稱呼為關聯型別，它結合了型別自動推斷以及型別別名
 //
-// Let's jump right into some code:
+// 讓我們直接跳到程式碼：
 protocol Container
 {
 	typealias ItemType
@@ -164,18 +152,16 @@ protocol Container
 	subscript(i: Int) -> ItemType { get }
 }
 
-// In the example above, we declare a Type Alias called ItemType, but because we're declaring
-// a protocol, we're only declaring the requirement for the conforming target to provide the
-// actual type alias.
+// 在上面的例子中，我們宣告了一個叫做 ItemType 的型別別名，但因為我們宣告的是協定，我們只需要宣告這個協定的要求
+// 即可，使用這個協定的類別、結構或列舉必須提供實際的型別
 //
-// With Generics, the type of ItemType can actually be inferred, such that it provides the correct
-// types for the append() and the subscript implementations.
+// 使用泛型後，ItemType 的型別可以被自動推斷，它為 append() 方法以及下標腳本的實作提供了正確的型別
 //
-// Let's see this in action as we turn our Stack into a container:
+// 讓我們看看這個實際運作的情況，這個堆疊已經被轉化為一個容器了：
 
 struct StackContainer<T> : Container
 {
-	// Here we find our original stack implementation, unmodified
+    // 在這兒我們使用原本實作堆疊的程式碼，完全沒有修改
 	
 	var items = [T]()
 	mutating func push(item: T)
@@ -187,7 +173,7 @@ struct StackContainer<T> : Container
 		return items.removeLast()
 	}
 	
-	// Below, we conform to the protocol
+    // 以下這段實作是為了滿足協定的要求
 	
 	mutating func append(item: T)
 	{
@@ -203,12 +189,11 @@ struct StackContainer<T> : Container
 	}
 }
 
-// The new StackContainer is now ready to go. You may notice that it does not include the
-// typealias that was required as part of the Container protocol. This is because the all of the
-// places where an ItemType would be used are using T. This allows Swift to perform a backwards
-// inferrence that ItemType must be a type T, and it allows this requirement to be met.
+// 這個新的 StackContainer 已經準備好可以使用了。你或許會注意到它並不包含在 Container 協定中所指定的 typealias
+// 。這是因為所有應該使用 ItemType 的地方，都已經被 T 所代替。這允許 Swift 得以自動地做向後型別推斷來得知 ItemType
+// 的型別就是 T，順道滿足了這個協定的要求
 //
-// Let's verify our work:
+// 讓我們檢查一下結果：
 var stringStack = StackContainer<String>()
 stringStack.push("Albert")
 stringStack.push("Andrew")
@@ -224,33 +209,31 @@ doubleStack.push(1_000_000)
 doubleStack.pop()
 doubleStack.count
 
-// We can also extend an existing types to conform to our new generic protocol. As it turns out
-// Swift's built-in Array class already supports the requirements of our Container.
+// 我們也可以將既存的型別做擴展，來滿足新的泛型協定。原來 Swift 內建的陣列類別就已經滿足了我們這個 Container 協
+// 定的要求
 //
-// Also, since the protocol's type inferrence method of implementing Generics, we can extend
-// String without the need to modify String other than to extend it to conform to the protocol:
+// 因為協定使用型別推斷的方法來實作泛型，所以我們不需要修改字串類別，就可以將字串型別擴展為滿足協定：
 extension Array: Container {}
 
 // ------------------------------------------------------------------------------------------------
-// Where Clauses
+// Where 語句
 //
-// We can further extend our constraints on a type by including where clauses as part of a type
-// parameter list. Where clauses provide a means for more constraints on associated types and/or
-// one or more equality relationships between types and associated types.
-//
-// Let's take a look at a where clause in action. We'll define a function that works on two
-// different containers that that must contain the same type of item.
+// 我們可以透過 where 語句來進一步擴展我們對型別的約束。where 語句提供了一個對所關聯型別，以及(或)一個或多個型別
+// 和關聯型別之間的對等關係
+
+// 讓我們看看 where 語句實際運作的狀況。我們將定義一個函式，它使用兩個不同的 container，每個 container 裡頭都
+// 要存放相同型別的元素
 func allItemsMatch
 	<C1: Container, C2: Container where C1.ItemType == C2.ItemType, C1.ItemType: Equatable>
 	(someContainer: C1, anotherContainer: C2) -> Bool
 {
-	// Check that both containers contain the same number of items
+    // 檢查是否兩個 container 包含了相同數目的元素
 	if someContainer.count != anotherContainer.count
 	{
 		return false
 	}
 	
-	// Check each pair of items to see if they are equivalent
+    // 檢查每一對元素，看看它們是否相等
 	for i in 0..<someContainer.count
 	{
 		if someContainer[i] != anotherContainer[i]
@@ -259,33 +242,30 @@ func allItemsMatch
 		}
 	}
 	
-	// All items match, so return true
+    // 所有的元素都相同，回傳 true
 	return true
 }
 
-// The function's type parameter list places the following restrictions on the types allowed:
+// 這個函式在參數列表的可使用型別上，設定了以下的限制：
 //
-// * C1 must conform to the Container protocol (C1: Container)
-// * C2 must also conform to the Container protocol (C1: Container)
-// * The ItemType for C1 must be the same as the ItemType for C2 (C1.ItemType == C2.ItemType)
-// * The ItemType for C1 must conform to the Equatable protocol (C1.ItemType: Equatable)
+// * C1 必須滿足 Container 協定 (C1: Container)
+// * C2 也必須滿足 Container 協定 (C2: Container)
+// * C1 的 ItemType 必須跟 C2 的 ItemType 相同 (C1.ItemType == C2.ItemType)
+// * C1 的 ItemType 必須滿足 Equatable 協定 (C1.ItemType: Equatable)
 //
-// Note that we only need to specify that C1.ItemType conforms to Equatable because the code
-// only calls the != operator (part of the Equatable protocol) on someContainer, which is the
-// type C1.
+// 注意，我們只需要指定 C1.ItemType 滿足 Equatable 協定，因為程式碼只使用了 != (Equatable 協定的一部份)
+// 運算子來比較 someContainer，也就是 C1 的型別
 //
-// Let's test this out by passing the same value for each parameter which should definitely
-// return true:
+// 讓我們傳入兩個同型別的參數來檢查一下這段程式碼，它應當一定得回傳 true：
 allItemsMatch(doubleStack, doubleStack)
 
-// We can compare stringStack against an array of type String[] because we've extended Swift's
-// Array type to conform to our Container protocol:
+// 我們可以比較 stringStack 與一個字串陣列，因為我們在先前已經擴展了 Swift 的陣列型別來滿足我們的 Container
+// 協定
 allItemsMatch(stringStack, ["Alpha", "Beta", "Theta"])
 
-// Finally, if we attempt to call allItemsMatch with a stringStack and a doubleStack, we would get
-// a compiler error because they do not store the same ItemType as defined in the function's
-// where clause.
+// 最後，如果我們試著傳入參數 stringStack 以及 doubleStack 來呼叫 allItemsMatch 函式，我們應該會得到一個編
+// 譯錯誤，以為它們所儲存的元素型別並不相同，這不滿足在函式的 where 語句中定義好的，ItemType 必須一樣的規定
 //
-// The following line of code does not compile:
+// 下面這一行程式碼無法編譯：
 //
 // allItemsMatch(stringStack, doubleStack)
