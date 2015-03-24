@@ -1,48 +1,43 @@
 // ------------------------------------------------------------------------------------------------
-// Things to know:
+// 本篇須知：
 //
-// * Arithmetic operators in Swift do not automatically overflow. Adding two values that overflow
-//   their type (for example, storing 300 in a UInt8) will cause an error. There are special
-//   operators that allow overflow, including dividing by zero.
+// * Swift 中的算數運算符並不會自動地溢位。將兩個值加在一起如果引發了超過它們型別的溢位(例如以 UInt8 來儲存 300)
+//   將會導致一個錯誤。Swift 中有允許溢位的特殊運算子，包括除以零
 //
-// * Swift allows developers to define their own operators, including those that Swift doesn't
-//   currently define. You can even specify the associativity and precedence for operators.
+// * Swift 允許開發者定義它們自己的運算子，包括那些 Swift 尚未定義的。你甚至還可以指定運算子的結合性以及優先權
 // ------------------------------------------------------------------------------------------------
 
 // ------------------------------------------------------------------------------------------------
-// Bitwise Operators
+// 位元運算子
 //
-// The Bitwise operators (AND, OR, XOR, etc.) in Swift effeectively mirror the functionality that
-// you're used to with C++ and Objective-C.
+// Swift 裡頭的位元運算子(AND, OR, XOR 等)與在 C++ 以及 Objective-C 裡頭的位元運算子功能並無二致
 //
-// We'll cover them briefly. The odd formatting is intended to help show the results:
+// 我們將簡單地涵蓋它們。這些奇特的格式意在幫助我們展示這些運算子的功用：
 var andResult: UInt8 =
    0b00101111 &
    0b11110100
-// 0b00100100 <- result
+// 0b00100100 <- 執行結果
 
 var notResult: UInt8 =
    ~0b11110000
-//  0b00001111 <- result
+//  0b00001111 <- 執行結果
 
 var orResult: UInt8 =
    0b01010101 |
    0b11110000
-// 0b11110101 <- result
+// 0b11110101 <- 執行結果
 
 var xorResult: UInt8 =
    0b01010101 ^
    0b11110000
-// 0b10100101 <- result
+// 0b10100101 <- 執行結果
 
-// Shifting in Swift is slightly different than in C++.
+// Swift 中的位移運算與 C++ 略有不同
 // 
-// A lesser-known fact about C++ is that the signed right-shift of a signed value is
-// implementation specific. Most compilers do what most programmers expect, which is an arithmetic
-// shift (which maintains the sign bit and shifts 1's into the word from the right.)
+// 一個鮮為人知的事實，是 C++ 中有號數的向右有號位移運算是被特殊處理過的。多數的編譯器使用多數程式設計師所預期的算
+// 術位移來處理這個情況(也就是保留了代表正負號的符號位元，而從右邊開始做內容位元的位移)
 //
-// Swift defines this behavior to be what you expect, shifting signed values to the right will
-// perform an arithmetic shift using two's compilment.
+// Swift 定義了這個符合你預期的行為。將一個有號值向右位移會使用 2 的補數規則來執行一個算術位移
 var leftShiftUnsignedResult: UInt8 = 32 << 1
 var leftShiftSignedResult: Int8 = 32 << 1
 var leftShiftSignedNegativeResult: Int8 = -32 << 1
@@ -52,30 +47,26 @@ var rightShiftSignedResult: Int8 = 32 >> 1
 var rightShiftSignedNegativeResult: Int8 = -32 >> 1
 
 // ------------------------------------------------------------------------------------------------
-// Overflow operators
+// 溢位運算子
 //
-// If an arithmetic operation (specifically addition (+), subtraction (-) and multiplication (*))
-// results in a value too large or too small for the constant or variable that the result is
-// intended for, Swift will produce an overflow/underflow error.
+// 如果儲存在一個變數或者是常數中的算術運算(特別是加法(+)、減法(-)與乘法(*))結果太大或太小。Swift 將會產生一個上
+// 溢位/下溢位錯誤
 //
-// The last two lines of this code block will trigger an overflow/underflow:
+// 此段程式碼中的最後兩行將引發上溢位/下溢位：
 //
 //	var positive: Int8 = 120
 //	var negative: Int8 = -120
 //	var overflow: Int8 = positive + positive
 //	var underflow: Int8 = negative + negative
 //
-// This is also true for division by zero, which can be caused with the division (/) or remainder
-// (%) operators.
+// 除零的操作也會引發溢位錯誤，這可以是由除法(/)運算子或是取餘(%)運算子導致的
 //
-// Sometimes, however, overflow and underflow behavior is exactly what the programmer may intend,
-// so Swift provides specific overflow/underflow operators which will not trigger an error and
-// allow the overflow/underflow to perform as we see in C++/Objective-C.
+// 然而，有時候上溢位以及下溢位的行為正是程式設計師所希冀的，所以 Swift 提供了特定的，不會引發溢位錯誤的上溢位/下
+// 溢位運算子，允許發生與 C++/Objective-C 中一樣的上溢位/下溢位現象
 //
-// Special operators for division by zero are also provided, which return 0 in the case of a
-// division by zero.
+// 也提供了允許除以零的特別運算子，這個除以零的操作將會回傳 0
 //
-// Here they are, in all their glory:
+// 這兒就是這些特殊運算子實際運作的情況：
 var someValue: Int8 = 120
 var aZero: Int8 = someValue - someValue
 var overflowAdd: Int8 = someValue &+ someValue
@@ -85,65 +76,61 @@ var divByZero: Int8 = 100 &/ aZero
 var remainderDivByZero: Int8 = 100 &% aZero
 
 // ------------------------------------------------------------------------------------------------
-// Operator Functions (a.k.a., Operator Overloading)
+// 運算子函式(也稱為運算子重載)
 //
-// Most C++ programmers should be familiar with the concept of operator overloading. Swift offers
-// the same kind of functionality as well as additional functionality of specifying the operator
-// precednce and associativity.
+// 多數 C++ 的程式設計師應當很熟悉運算子重載的概念。Swift 提供了一樣的功能與額外的能力來指定運算子的優先權以及結合
+// 性
 //
-// The most common operators will usually take one of the following forms:
+// 最常見的運算子大概是以下這些形式之一：
 //
-//  * prefix: the operator appears before a single identifier as in "-a" or "++i"
-//  * postfix: the operator appears after a single identifier as in "i++"
-//  * infix: the operator appears between two identifiers as in "a + b" or "c / d"
+//  * 前綴：運算子出現在對象之前，例如 "-a" 或 "++i"
+//  * 後綴：運算子出現在對象之後，例如 "i++"
+//  * 中綴：運算子出現在兩個對象中間，例如 "a + b" 或 "c / d"
 //
-// These are specified with the three attributes, @prefix, @postfix and @infix.
+// 這些運算子被三個屬性所指定：@prefix, @postfix 以及 @infix
 //
-// There are more types of operators (which use different attributes, which we'll cover shortly.
+// 還有其他不同類型的運算子(使用不同的屬性，我們待會也會涵蓋到)
 //
-// Let's define a Vector2D class to work with:
+// 讓我們定義一個 Vector2D 的類別以便處理：
 struct Vector2D
 {
 	var x = 0.0
 	var y = 0.0
 }
 
-// Next, we'll define a simple vector addition (adding the individual x & y components to create
-// a new vector.)
+// 接下來，我們將定義一個簡單的向量加法運算(將個別的 x 與 y 相加以創建一個新向量)
 //
-// Since we're adding two Vector2D instances, we'll use operator "+". We want our addition to take
-// the form "vectorA + vectorB", which means we'll be defining an infix operator.
+// 因為我們正在將兩個 Vector2D 實體相加，我們打算使用 "+" 運算子來做這個操作。我們希望這個對兩個向量做相加的動作可
+// 以被表達為 "向量A + 向量B"，因此我們要定義一個中綴運算子
 //
-// Here's what that looks like:
+// 這兒是運算子函式看起來的樣子：
 func + (left: Vector2D, right: Vector2D) -> Vector2D
 {
 	return Vector2D(x: left.x + right.x, y: left.y + right.y)
 }
 
-// Let's verify our work:
+// 讓我們確認一下這個函式的效果：
 var a = Vector2D(x: 1.0, y: 2.0)
 var b = Vector2D(x: 3.0, y: 4.0)
 var c = a + b
 
-// We've seen the infix operator at work so let's move on to the prefix and postfix operators.
-// We'll define a prefix operator that negates the vector taking the form (result = -value):
+// 我們看到了中綴運算子發揮了它的作用，讓我們繼續往下看看前綴運算子以及後綴運算子。我們將定義一個前綴運算子來改變所操
+// 作向量的正負號(結果為原本的值加上負號)
 prefix func - (vector: Vector2D) -> Vector2D
 {
 	return Vector2D(x: -vector.x, y: -vector.y)
 }
 
-// Check our work:
+// 檢查一下我們的改動：
 c = -a
 
-// Next, let's consider the common prefix increment operator (++a) and postfix increment (a++)
-// operations. Each of these performs the operation on a single value whle also returning the
-// appropriate result (either the original value before the increment or the value after the
-// increment.)
+// 接下來，讓我們考慮一下一般的前綴遞增運算子(++a)以及後綴遞增運算子(a++)的運算。任一種運算都是對單一的值操作，並且
+// 回傳相應的結果。(要嘛是遞增前的原始值，不然就是遞增後的新值)
 //
-// Each will either use the @prefix or @postfix attribute, but since they also modify the value
-// they are also @assigmnent operators (and make use of inout for the parameter.)
+// 每一種運算使用的屬性為 @prefix 或 @postfix 其中之一，但因為它們也修改了所操作對象的值，所以它們同時也算是
+// @assigmnent 運算子(並且使用了 inout 關鍵字)
 //
-// Let's take a look:
+// 讓我們一起來看看：
 prefix func ++ (inout vector: Vector2D) -> Vector2D
 {
 	vector = vector + Vector2D(x: 1.0, y: 1.0)
@@ -157,23 +144,20 @@ postfix func ++ (inout vector: Vector2D) -> Vector2D
 	return previous
 }
 
-// And we can check our work:
+// 讓我們檢查一下這些函式的執行結果：
 ++c
 c++
 c
 
-// Equivalence Operators allow us to define a means for checking if two values are the same
-// or equivalent. They can be "equal to" (==) or "not equal to" (!=). These are simple infix
-// opertors that return a Bool result.
+// 相等運算子允許我們定義一個檢查兩個值是否相同或相等的手段。它們之間的關係可以是"等於" (==) 或"不等於"(!=)。
+// 這些都是會回傳運算結果布林值的基本中綴運算子
 //
-// Let's also take a moment to make sure we do this right. When comparing floating point values
-// you can either check for exact bit-wise equality (a == b) or you can compare values that are
-// "very close" by using an epsilon. It's important to recognize the difference, as there are
-// cases when IEEE floating point values should be equal, but are actually represented differently
-// in their bit-wise format because they were calculated differently. In these cases, a simple
-// equality comparison will not suffice.
+// 讓我們花一些時間來確保每個步驟都正確。當比較浮點數的值的時候，你要嘛是精確地檢查每個位元(a==b)，不然就是使用一
+// 個代表非常小的值的 epsilon 來比較它們的值是否"非常地接近"。辨識出兩種做法之間的差異是很重要的，作為 IEEE 定
+// 義的浮點數值應該相等，但在實際呈現出來的時候，僅因為當初計算它們時所使用的運算式不同，就導致了內部的位元值不相同
+// 。在這些情況中，一個簡單的比較方式是無法滿足我們的要求的
 //
-// So here are our more robust equivalence operators:
+// 所以這兒列出來的是更為可靠的相等運算子比較方式：
 let Epsilon = 0.1e-7
 
 func == (left: Vector2D, right: Vector2D) -> Bool
@@ -184,76 +168,70 @@ func == (left: Vector2D, right: Vector2D) -> Bool
 }
 func != (left: Vector2D, right: Vector2D) -> Bool
 {
-	// Here, we'll use the inverted result of the "==" operator:
+    // 這裡，我們將使用經過 == 運算子運算過後的反相結果：
 	return !(left == right)
 }
 
 // ------------------------------------------------------------------------------------------------
-// Custom Operators
+// 自訂運算子
 //
-// So far, we've been defining operator functions for operators that Swift understands and
-// for which Swift provides defined behaviors. We can also define our own custom operators for
-// doing other interestig things.
+// 到目前為止，我們已為了 Swift 已定義好的運算子以及定義好的默認行為，定義了新的運算子函式。我們也可以自定義屬於
+// 我們自己的自訂運算子來完成其他有趣的事情
 //
-// For example, Swift doesn't support the concept of a "vector normalization" or "cross product"
-// because this functionality doesn't apply to any of the types Swift offers.
+// 例如，Swift 並不支援"正規化向量"或者是"向量正交"的處理，因為 Swift 中沒有任何一個型別提供這些功能
 //
-// Let's keep it simple, though. How about an operator that adds a vector to itself. Let's make
-// this a prefix operator that takes the form "+++value"
+// 讓我們維持這個設計的簡單原則。以處理一個向量相加自身向量的運算來說，讓我們創建一個使用這種型態 "+++value"
+// 的前綴運算子
 //
-// First, we we must introduce Swift to our new operator. The syntax takes the form of the
-// 'operator' keyword, folowed by either 'prefix', 'postfix' or 'infix':
+// 首先，我們必須向 Swift 介紹我們的新運算子。這個語法使用了一個 'operator' 關鍵字，緊接著在 'prefix'、
+// 'postfix' 或 'infix' 關鍵字的後方：
 //
-// Swift meet operator, operator meet swift:
+// Swift 藉由這個語法跟新的自定義運算子做聯結：
 prefix operator +++ {}
 
-// Now we can declare our new operator:
+// 現在我們可以宣告我們的新運算子函式：
 prefix func +++ (inout vector: Vector2D) -> Vector2D
 {
 	vector = vector + vector
 	return vector
 }
 
-// Let's check our work:
+// 讓我們檢查一下這個函式的執行結果：
 var someVector = Vector2D(x: 5.0, y: 9.0)
 +++someVector
 
 // ------------------------------------------------------------------------------------------------
-// Precedence and Associativity for Custom Infix Operators
+// 自定義中綴運算子的優先權以及結合性
 //
-// Custom infix operators can define their own associativity (left-to-right or right-to-left or
-// none) as well as a precedence for determining the order of operations.
+// 自定義的中綴運算子可以為它們的運算過程，定義屬於它們自己的優先權以及結合性(由左到右或由右到左或兩者都不是)
 //
-// Associativity values are 'left' or 'right' or 'none'.
+// 結合性的值是 'left' 或 'right' 或 'none'
 // 
-// Precedence values are ranked with a numeric value. If not specified, the default value is 100.
-// Operations are performed in order of precedence, with higher values being performed first. The
-// precedence values are relative to all other precedence values for other operators. The following
-// are the default values for operator precedence in the Swift standard library:
+// 優先權的先後以一個數值做排序。如果沒有指定的話，默認的值是 100。運算過程會以優先權的先後來做運算，高的數值會優
+// 先被執行。比較優先權數值的方式是相對於所有其他運算子的優先權數值而言。下列是在 Swift 的標準函式庫中運算子的優
+// 先權數值：
 //
-// 160 (none):  Operators <<  >>
-// 150 (left):  Operators *  /  %  &*  &/  &%  &
-// 140 (left):  Operators +  -  &+  &-  |  ^
-// 135 (none):  Operators ..  ...
-// 132 (none):  Operators is as
-// 130 (none):  Operators < <= > >= == != === !== ~=
-// 120 (left):  Operators &&
-// 110 (left):  Operators ||
-// 100 (right): Operators ?:
-//  90 (right): Operators = *= /= %= += -= <<= >>= &= ^= |= &&= ||=
+// 160 (none):  運算子 <<  >>
+// 150 (left):  運算子 *  /  %  &*  &/  &%  &
+// 140 (left):  運算子 +  -  &+  &-  |  ^
+// 135 (none):  運算子 ..  ...
+// 132 (none):  運算子 is as
+// 130 (none):  運算子 < <= > >= == != === !== ~=
+// 120 (left):  運算子 &&
+// 110 (left):  運算子 ||
+// 100 (right): 運算子 ?:
+//  90 (right): 運算子 = *= /= %= += -= <<= >>= &= ^= |= &&= ||=
 //
-// Let's take a look at how we define a new custom infix operator with left associativity and a
-// precedence of 140.
+// 讓我們看看如何定義一個有著由左到右的結合性、優先權數值為 140 的新自定義中綴運算子
 //
-// We'll define a function that adds the 'x' components of two vectors, but subtracts the 'y'
-// components. We'll call this the "+-" operator:
+// 我們可以定義一個將兩向量的 'x' 方向相加，但 'y' 方向相減的運算子函式。這個運算子將被稱為 "+-" 運算子：
 infix operator +- { associativity left precedence 140 }
 func +- (left: Vector2D, right: Vector2D) -> Vector2D
 {
 	return Vector2D(x: left.x + right.x, y: left.y - right.y)
 }
 
-// Check our work. Let's setup a couple vectors that result in a value of (0, 0):
+// 檢查一下我們的新運算子函式的執行結果。讓我們設置一對向量，讓它們兩者的運算結果為 (0, 0)：
 var first = Vector2D(x: 5.0, y: 5.0)
 var second = Vector2D(x: -5.0, y: 5.0)
 first +- second
