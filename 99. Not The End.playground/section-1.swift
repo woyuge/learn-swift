@@ -6,54 +6,48 @@
 //   \____\___/|_| |_|\__, |_|  \__,_|\__|___(_)
 //                    |___/
 //
-//                                                You've made it to the end!
+//                                                你抵達了終點！
 //
 // ------------------------------------------------------------------------------------------------
 
 // ------------------------------------------------------------------------------------------------
-// There's Still More To Learn
+// 還有許多東西可以學
 //
-// These playgrounds are taken directly from the Language Guide section of Apple's book titled
-// "The Swift Programming Language".
+// 這些遊樂場檔案中的範例是直接從蘋果電腦的 "Swift 程式語言" 中語言指南的部份擷取出來的
 // 
-// The book also includes a Language Reference, which discusses the language in a more terse form
-// with greater detail (including the grammar.) It's not as dry as reading the C++ Ansi Spec, but
-// it's still rather detailed. In fact, some of the information from these playgrounds came from
-// the Language Reference section.
+// 這本書也包含了語言參考章節，它使用了更精簡的方式以及更深入的內容(包含文法)來探討這個語言。雖然沒有像閱讀美國國家標準
+// 協會所制定的 C++ 語法標準那麼的清楚，但它仍然包含了許多細節。事實上，這些遊樂場中，有一部份的內容就是從語言參考章節
+// 中擷取出來的
 //
-// The good news is that having managed to get through these playgrounds, you'll probably find
-// the Language Reference to be rather quick reading, chock full of additional goodies that you
-// never knew about (because the Language Guide and these Playgrounds don't touch on.)
+// 好消息是，如果你已設法搞懂所有遊樂場檔案中的內容，那麼或許你會發現從語言參考章節中，將這些你還不了解的(因為語言指南以
+// 及遊樂場檔案沒有介紹)額外資訊搞懂其實挺快的
 //
-// For example, how would you code the assert function such that the first parameter is executed
-// and evaluated to a Bool for use in determining an error condition?
+// 例如，你該如何撰寫一個斷言函式，藉由第一個參數的執行結果來確認錯誤狀態？
 var pi = 3.14159
 assert(pi > 3.14, "Pi is too small")
 
-// Do you know why this compiles?
+// 你知道為什麼下面這一行可以編譯嗎？
 func doSomeMagic(#a: Int)(b: Int) -> Int
 {
 	return a + b
 }
 
-// ...or why it can be executed like this?
+// ...或者是為什麼可以如此呼叫它呢？
 doSomeMagic(a: 10)(b: 10)
 
-// You'll also learn about Metatypes and did you know that Swift's operator precedence is slightly
-// different than C?
+// 你也可以學習元型別。以及你知道在 Swift 中，運算子的優先權跟 C 語言不太相同嗎？
 //
-// This is clearly stuff you should know before submitting your forehead to the wall.
+// 顯然，這些東西是你在進一步深入前需要先搞清楚的
 //
-// You'll learn about these constants:
+// 你會學到關於這些常數的訊息：
 __FILE__ + "(" + String(__LINE__) + "): " + __FUNCTION__ + ":" + String(__COLUMN__)
 
-// Furthermore, don't let somebody else's code confuse you when you see something like this in
-// their code and realize that it actually compiles!
+// 此外，別讓任何人的程式碼將你搞糊塗了，尤其是當你看到像下面這種程式碼居然可以編譯的時候！
 var ohrly = pi.dynamicType.infinity
 
-// Most importantly, you'll solidify your understanding of the concepts that were presented in
-// these playgrounds.
+// 最重要的事情是，你對這些遊樂場檔案中所展示的概念，將會有非常透徹的理解
 //
-// Happy coding!
+// 祝寫碼愉快！
+//
 //
 // - Paul Nettle
