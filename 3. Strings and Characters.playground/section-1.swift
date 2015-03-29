@@ -60,7 +60,7 @@ var notAString: Character = "t"
 // NSString 計算字串中包含多少字元的方式，是建立使用 UTF-16 來表達字串的方式上，而不是字串中萬國碼的個數。為了反映
 // 這個事實，當使用 NSString 的 length 屬性來取得 Swift 的 String 的字串長度時，它是呼叫 utf16count 這個方法
 // 來計算字元的個數
-count(originalString)
+countElements(originalString)
 
 // 將 Character 轉為 String 後，可以使用 + 號直接連接
 var helloworld = "hello, " + "world"
