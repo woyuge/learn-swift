@@ -116,19 +116,19 @@ let someObjects: [AnyObject] =
 // 讓我們看看該如何使用這個 someObjects[]：
 for object: AnyObject in someObjects
 {
-	let movie = object as! Movie
+	let movie = object as Movie
 	"Movie: '\(movie.name)' was directed by \(movie.director)"
 }
 
 // 另外，我們可以將整個陣列向下轉型，而不是一個個元素分別處理：
-var someMovies = someObjects as! [Movie]
+var someMovies = someObjects as [Movie]
 for movie in someMovies
 {
 	"Movie: '\(movie.name)' was directed by \(movie.director)"
 }
 
 // 最後，我們可以避免使用多餘的區域變數，並且在循環結構中直接使用向下轉型：
-for movie in someObjects as! [Movie]
+for movie in someObjects as [Movie]
 {
 	"Movie: '\(movie.name)' was directed by \(movie.director)"
 }

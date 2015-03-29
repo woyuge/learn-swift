@@ -48,7 +48,7 @@ protocol someProtocolForProperties
 	var doesNotNeedToBeSettable: Int { get }
 	
     // 使用 'static' 關鍵字來定義一個型別屬性
-	static var someTypeProperty: Int { get set }
+	class var someTypeProperty: Int { get set }
 }
 
 // 讓我們創建一個待會可以真的來遵循的實際協定：
